@@ -1,18 +1,23 @@
 package com.smartinsurance.claims.service;
 
-import com.smartinsurance.claims.dto.request.PurchasePolicyRequest;
-import com.smartinsurance.claims.dto.response.PolicyResponse;
-import com.smartinsurance.claims.entity.*;
-import com.smartinsurance.claims.exception.BadRequestException;
-import com.smartinsurance.claims.exception.ResourceNotFoundException;
-import com.smartinsurance.claims.repository.PolicyRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.smartinsurance.claims.dto.request.PurchasePolicyRequest;
+import com.smartinsurance.claims.dto.response.PolicyResponse;
+import com.smartinsurance.claims.entity.Customer;
+import com.smartinsurance.claims.entity.Policy;
+import com.smartinsurance.claims.entity.PolicyStatus;
+import com.smartinsurance.claims.entity.Product;
+import com.smartinsurance.claims.exception.BadRequestException;
+import com.smartinsurance.claims.exception.ResourceNotFoundException;
+import com.smartinsurance.claims.repository.PolicyRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +69,7 @@ public class PolicyService {
                 .nomineeRelation(request.nomineeRelation())
                 .startDate(start)
                 .endDate(end)
-                .status(PolicyStatus.ACTIVE)
+                .status(PolicyStatus.PENDING)
                 .premiumAmount(product.getPremiumAmount())
                 .build();
 
@@ -92,6 +97,26 @@ public class PolicyService {
             throw new BadRequestException("Only active policies can be cancelled");
         }
         policy.setStatus(PolicyStatus.CANCELLATION_REQUESTED);
+        return toResponse(policy);
+    }
+
+    @Transactional
+    public PolicyResponse approve(Long policyId) {
+        Policy policy = findById(policyId);
+        if (policy.getStatus() != PolicyStatus.PENDING) {
+            throw new BadRequestException("Only pending policies can be approved");
+        }
+        policy.setStatus(PolicyStatus.ACTIVE);
+        return toResponse(policy);
+    }
+
+    @Transactional
+    public PolicyResponse reject(Long policyId) {
+        Policy policy = findById(policyId);
+        if (policy.getStatus() != PolicyStatus.PENDING) {
+            throw new BadRequestException("Only pending policies can be rejected");
+        }
+        policy.setStatus(PolicyStatus.REJECTED);
         return toResponse(policy);
     }
 

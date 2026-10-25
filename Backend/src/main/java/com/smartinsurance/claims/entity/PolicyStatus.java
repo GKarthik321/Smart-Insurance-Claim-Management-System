@@ -5,5 +5,6 @@ public enum PolicyStatus {
     ACTIVE,
     EXPIRED,
     CANCELLATION_REQUESTED,
-    CANCELLED
+    CANCELLED,
+    REJECTED
 }

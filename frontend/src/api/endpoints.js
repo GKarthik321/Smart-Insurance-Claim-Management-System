@@ -18,6 +18,8 @@ export const purchasePolicy = (payload) => api.post('/policies/purchase', payloa
 export const renewPolicy = (id) => api.post(`/policies/${id}/renew`);
 export const cancelPolicy = (id) => api.post(`/policies/${id}/cancel`);
 export const approveCancellation = (id) => api.post(`/policies/${id}/approve-cancellation`);
+export const approvePolicy = (id) => api.post(`/policies/${id}/approve`);
+export const rejectPolicy = (id) => api.post(`/policies/${id}/reject`);
 
 export const getMyClaims = () => api.get('/claims/me');
 export const fileClaim = (payload) => api.post('/claims', payload);
